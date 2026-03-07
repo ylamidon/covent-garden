@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Covent Garden</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        .legend {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            line-height: 1.8;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .legend h3 { margin: 0 0 8px 0; font-size: 14px; }
+        .legend-item { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .legend-dot {
+            width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+        }
+        .step-label {
+            font-weight: bold; font-size: 11px; margin-top: 6px; color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([51.5125, -0.1245], 16);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        const colors = {
+            1: '#e74c3c', // rouge - Seven Dials
+            2: '#e67e22', // orange - Mercer/Floral
+            3: '#2ecc71', // vert - Piazza
+            4: '#3498db', // bleu - King/Southampton/Drury
+            5: '#9b59b6'  // violet - Trafalgar
+        };
+
+        function createIcon(color, label) {
+            return L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="
+                    background: ${color};
+                    color: white;
+                    width: 28px; height: 28px;
+                    border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    font-weight: bold; font-size: 13px;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+                ">${label}</div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14],
+                popupAnchor: [0, -16]
+            });
+        }
+
+        const places = [
+            // Etape 1 - Seven Dials / Neal Street
+            { name: "Cucumber Alley / Seven Dials Market", addr: "35 Earlham St, WC2H 9LA", lat: 51.51435, lng: -0.12685, step: 1, num: "1a" },
+            { name: "Humble Crumble", addr: "50a Earlham St, WC2H 9LA", lat: 51.51420, lng: -0.12650, step: 1, num: "1b" },
+            { name: "Ole & Steen", addr: "39 Neal St, WC2H 9PU", lat: 51.51380, lng: -0.12560, step: 1, num: "1c" },
+            { name: "Nike Running Store", addr: "14-15 Neal St, WC2H 9LY", lat: 51.51290, lng: -0.12470, step: 1, num: "1d" },
+
+            // Etape 2 - Mercer / Floral
+            { name: "Runners Need / On Running", addr: "9A Mercer St, WC2H 9QJ", lat: 51.51310, lng: -0.12620, step: 2, num: "2a" },
+            { name: "Arc'teryx", addr: "19-20 Floral St, WC2E 8JS", lat: 51.51260, lng: -0.12400, step: 2, num: "2b" },
+
+            // Etape 3 - Piazza
+            { name: "Covent Garden Market", addr: "The Piazza, WC2E 8RF", lat: 51.51190, lng: -0.12260, step: 3, num: "3a" },
+            { name: "Apple Store", addr: "1-7 The Piazza, WC2E 8HA", lat: 51.51170, lng: -0.12310, step: 3, num: "3b" },
+
+            // Etape 4 - King / Southampton / Drury
+            { name: "Salomon Store", addr: "13 King St, WC2E 9AA", lat: 51.51200, lng: -0.12140, step: 4, num: "4a" },
+            { name: "Ellis Brigham", addr: "10-12 Southampton St, WC2E 7HA", lat: 51.51100, lng: -0.12170, step: 4, num: "4b" },
+            { name: "Caravan", addr: "30-35 Drury Lane, WC2B 5RH", lat: 51.51340, lng: -0.12100, step: 4, num: "4c" },
+
+            // Etape 5 - Trafalgar
+            { name: "National Gallery", addr: "Trafalgar Square, WC2N 5DN", lat: 51.50890, lng: -0.12830, step: 5, num: "5" },
+        ];
+
+        // Add markers
+        places.forEach(p => {
+            const icon = createIcon(colors[p.step], p.num);
+            L.marker([p.lat, p.lng], { icon })
+                .addTo(map)
+                .bindPopup(`
+                    <strong>${p.name}</strong><br>
+                    <span style="color:#666">${p.addr}</span><br>
+                    <em style="color:${colors[p.step]}">Etape ${p.step}</em>
+                `);
+        });
+
+        // Draw route path
+        const route = places.map(p => [p.lat, p.lng]);
+        L.polyline(route, {
+            color: '#555',
+            weight: 2,
+            opacity: 0.5,
+            dashArray: '8, 8'
+        }).addTo(map);
+
+        // Legend
+        const legend = L.control({ position: 'topright' });
+        legend.onAdd = function() {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = `
+                <h3>Plan de visite - Covent Garden</h3>
+                <div class="step-label" style="color:${colors[1]}">Etape 1 - Seven Dials</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[1]}"></span> 1a. Cucumber Alley</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[1]}"></span> 1b. Humble Crumble</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[1]}"></span> 1c. Ole & Steen</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[1]}"></span> 1d. Nike Running</div>
+                <div class="step-label" style="color:${colors[2]}">Etape 2 - Mercer / Floral St</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[2]}"></span> 2a. Runners Need / On Running</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[2]}"></span> 2b. Arc'teryx</div>
+                <div class="step-label" style="color:${colors[3]}">Etape 3 - Covent Garden Piazza</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[3]}"></span> 3a. Covent Garden Market</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[3]}"></span> 3b. Apple Store</div>
+                <div class="step-label" style="color:${colors[4]}">Etape 4 - King / Drury Lane</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[4]}"></span> 4a. Salomon Store</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[4]}"></span> 4b. Ellis Brigham</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[4]}"></span> 4c. Caravan (restaurant)</div>
+                <div class="step-label" style="color:${colors[5]}">Etape 5 - Trafalgar Square</div>
+                <div class="legend-item"><span class="legend-dot" style="background:${colors[5]}"></span> 5. National Gallery</div>
+            `;
+            return div;
+        };
+        legend.addTo(map);
+    </script>
+</body>
+</html>
