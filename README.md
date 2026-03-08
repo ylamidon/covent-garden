@@ -4,7 +4,7 @@ Carte interactive pour une visite guidée à pied de Covent Garden (Londres), av
 
 ## Voir la carte
 
-[yannl.github.io/covent-garden](https://yannl.github.io/covent-garden)
+[ylamidon.github.io/covent-garden](https://ylamidon.github.io/covent-garden/)
 
 ## Étapes
 
