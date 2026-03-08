@@ -16,6 +16,8 @@
    - **Ellis Brigham** - Tower House, 10-12 Southampton Street, London, WC2E 7HA
 9. **National Gallery** - Trafalgar Square, London, WC2N 5DN
 10. **Apple Store** - 1-7 The Piazza, Covent Garden, London, WC2E 8HA
+11. **Arret de bus 1/188 (Aldwych / Drury Lane)** - Aldwych, London, WC2B 4BL
+12. **Charing Cross Station** - The Strand, London, WC2N 5HF
 
 ---
 
