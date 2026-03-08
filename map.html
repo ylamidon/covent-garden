@@ -25,6 +25,37 @@
         .step-label {
             font-weight: bold; font-size: 11px; margin-top: 6px; color: #555;
         }
+        .legend-toggle {
+            display: none;
+            cursor: pointer;
+            background: white;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .legend-content { display: block; }
+        @media (max-width: 600px) {
+            .legend-toggle { display: block; }
+            .legend {
+                background: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            .legend-content {
+                display: none;
+                background: rgba(255,255,255,0.95);
+                padding: 12px 16px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                margin-top: 6px;
+                max-height: 50vh;
+                overflow-y: auto;
+            }
+            .legend-content.open { display: block; }
+        }
     </style>
 </head>
 <body>
@@ -114,7 +145,16 @@
         const legend = L.control({ position: 'topright' });
         legend.onAdd = function() {
             const div = L.DomUtil.create('div', 'legend');
-            div.innerHTML = `
+            const toggle = L.DomUtil.create('button', 'legend-toggle', div);
+            toggle.textContent = 'Liste';
+            const content = L.DomUtil.create('div', 'legend-content', div);
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                content.classList.toggle('open');
+                toggle.textContent = content.classList.contains('open') ? 'X' : 'Liste';
+            });
+            L.DomEvent.disableClickPropagation(div);
+            content.innerHTML = `
                 <h3>Plan de visite - Covent Garden</h3>
                 <div class="step-label" style="color:${colors[1]}">Etape 1 - Seven Dials</div>
                 <div class="legend-item"><span class="legend-dot" style="background:${colors[1]}"></span> 1a. Cucumber Alley</div>
